@@ -3,11 +3,10 @@ package ltsv
 import (
 	"encoding/csv"
 	"errors"
-	"io"
 	"fmt"
+	"io"
 	"strings"
 )
-
 
 // These are the errors that can be returned in ParseError.Error
 var (
@@ -15,12 +14,11 @@ var (
 	ErrLabelName   = errors.New("unexpected label name")
 )
 
-
 // A Reader reads from a Labeled TSV (LTSV) file.
-// 
+//
 // As returned by NewReader, a Reader expects input conforming LTSV (http://ltsv.org/)
 type LTSVReader struct {
-	Reader *csv.Reader
+	Reader      *csv.Reader
 	FieldLabels map[string]struct{}
 	initialized bool
 }
@@ -30,9 +28,9 @@ func NewReader(r io.Reader) *LTSVReader {
 	reader := csv.NewReader(r)
 	reader.Comma = '\t'
 	return &LTSVReader{
-		Reader: reader,
+		Reader:      reader,
 		FieldLabels: make(map[string]struct{}),
-	}	
+	}
 }
 
 // error creates a new Error based on err.
@@ -76,7 +74,6 @@ func (r *LTSVReader) Read() (record map[string]string, err error) {
 	fmt.Printf("test: %v\n", record)
 	return record, nil
 }
-
 
 // ReadAll reads all the remainig records from r.
 // Each records is a slice of map of fields.
