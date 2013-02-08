@@ -1,9 +1,8 @@
 package ltsv
 
 import (
-	"encoding/csv"
+	"bufio"
 	"errors"
-	"fmt"
 	"io"
 	"strings"
 )
@@ -18,19 +17,12 @@ var (
 //
 // As returned by NewReader, a Reader expects input conforming LTSV (http://ltsv.org/)
 type LTSVReader struct {
-	Reader      *csv.Reader
-	FieldLabels map[string]struct{}
-	initialized bool
+	reader *bufio.Reader
 }
 
 // NewReader returns a new LTSVReader that reads from r.
 func NewReader(r io.Reader) *LTSVReader {
-	reader := csv.NewReader(r)
-	reader.Comma = '\t'
-	return &LTSVReader{
-		Reader:      reader,
-		FieldLabels: make(map[string]struct{}),
-	}
+	return &LTSVReader{bufio.NewReader(r)}
 }
 
 // error creates a new Error based on err.
@@ -42,36 +34,37 @@ func (r *LTSVReader) error(err error) error {
 // Read reads one record from r. The record is a map of string with
 // each key and value representing one field.
 func (r *LTSVReader) Read() (record map[string]string, err error) {
-	rawRecord, err := r.Reader.Read()
-	if err != nil {
-		return nil, err
-	}
-
+	var line []byte
 	record = make(map[string]string)
-	for _, field := range rawRecord {
-		data := strings.SplitN(field, ":", 2)
-		if len(data) != 2 {
-			return record, r.error(ErrFieldFormat)
+
+	for {
+		line, _, err = r.reader.ReadLine()
+		if err != nil {
+			return nil, err
 		}
-		if r.initialized {
-			if _, ok := r.FieldLabels[data[0]]; ok {
-				record[data[0]] = data[1]
-			} else {
-				return nil, r.error(ErrLabelName)
+
+		sline := strings.TrimSpace(string(line))
+		if sline == "" {
+			// Skip empty line
+			continue
+		}
+		tokens := strings.Split(sline, "\t")
+		if len(tokens) == 0 {
+			return nil, r.error(ErrFieldFormat)
+		}
+		for _, field := range tokens {
+			if field == "" {
+				continue
 			}
-		} else {
+			data := strings.SplitN(field, ":", 2)
+			if len(data) != 2 {
+				return record, r.error(ErrLabelName)
+			}
 			record[data[0]] = data[1]
 		}
+		return record, nil
 	}
-
-	if !r.initialized {
-		for label, _ := range record {
-			r.FieldLabels[label] = struct{}{}
-		}
-		r.initialized = true
-	}
-
-	return record, nil
+	return
 }
 
 // ReadAll reads all the remainig records from r.
