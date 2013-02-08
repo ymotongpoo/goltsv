@@ -80,7 +80,6 @@ func (r *LTSVReader) Read() (record map[string]string, err error) {
 func (r *LTSVReader) ReadAll() (records []map[string]string, err error) {
 	for {
 		record, err := r.Read()
-		fmt.Printf("record: %v\n", record)
 		if err == io.EOF {
 			return records, nil
 		}
