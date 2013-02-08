@@ -71,7 +71,6 @@ func (r *LTSVReader) Read() (record map[string]string, err error) {
 		r.initialized = true
 	}
 
-	fmt.Printf("test: %v\n", record)
 	return record, nil
 }
 
