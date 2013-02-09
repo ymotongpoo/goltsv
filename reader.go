@@ -1,4 +1,4 @@
-package ltsv
+package goltsv
 
 import (
 	"bufio"
