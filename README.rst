@@ -2,7 +2,9 @@
  goltsv
 ========
 
-LTSV (Labeled Tab Separeted Value) reader/writer for Go. 
+LTSV (Labeled Tab Separeted Value) reader/writer for Go.
+
+.. image:: https://drone.io/github.com/ymotongpoo/goltsv/status.png
 
 Example
 =======
