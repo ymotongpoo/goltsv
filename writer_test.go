@@ -8,17 +8,17 @@ import (
 
 // TODO(ymotongpoo): Output remains for testing ordered LTSV
 var writeTests = []struct {
-	Input map[string]string
-	Output string
+	Input   map[string]string
+	Output  string
 	UseCRLF bool
 }{
 	{
-		Input: map[string]string{"hoge": "foo"},
+		Input:  map[string]string{"hoge": "foo"},
 		Output: "hoge:foo\n",
 	},
 	{
-		Input: map[string]string{"hoge": "foo"},
-		Output: "hoge:foo\r\n",
+		Input:   map[string]string{"hoge": "foo"},
+		Output:  "hoge:foo\r\n",
 		UseCRLF: true,
 	},
 	{
@@ -33,8 +33,8 @@ var writeTests = []struct {
 
 // TODO(ymotongpoo): Output remains for testing ordered LTSV
 var writeAllTests = []struct {
-	Input []map[string]string
-	Output string
+	Input   []map[string]string
+	Output  string
 	UseCRLF bool
 }{
 	{
@@ -47,7 +47,6 @@ perl:5.17.8	ruby:2.0	python:2.6
 sushi:寿司	tennpura:天ぷら	ramen:ラーメン	gyoza:餃子\n`,
 	},
 }
-
 
 func TestWrite(t *testing.T) {
 	for n, tt := range writeTests {
@@ -67,7 +66,7 @@ func TestWrite(t *testing.T) {
 		if err != nil {
 			t.Errorf("Unexpected error: %s\n", err)
 		}
-		
+
 		if !reflect.DeepEqual(out, tt.Input) {
 			t.Errorf("#%d: out=%q want %q", n, b.String(), tt.Output)
 		}

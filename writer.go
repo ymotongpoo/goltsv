@@ -12,9 +12,8 @@ import (
 // Detailed format is described in LTSV official web site. (http://ltsv.org/)
 type LTSVWriter struct {
 	UseCRLF bool
-	writer *bufio.Writer
+	writer  *bufio.Writer
 }
-
 
 // NewWriter returns a new Writer that writes to w.
 func NewWriter(w io.Writer) *LTSVWriter {
@@ -52,7 +51,6 @@ func (w *LTSVWriter) Write(record map[string]string) (err error) {
 	return
 }
 
-
 // WriteAll writes multiple LTSV records to w using Write and then calls Flush.
 func (w *LTSVWriter) WriteAll(records []map[string]string) (err error) {
 	for _, record := range records {
@@ -63,4 +61,3 @@ func (w *LTSVWriter) WriteAll(records []map[string]string) (err error) {
 	}
 	return w.writer.Flush()
 }
-
