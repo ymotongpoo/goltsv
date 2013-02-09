@@ -3,7 +3,6 @@ package goltsv
 import (
 	"bufio"
 	"io"
-	"strings"
 )
 
 // A Writer wites records to a LTSV encoded file.
@@ -12,14 +11,15 @@ import (
 // newline and uses '\t' as the field delimiter.
 // Detailed format is described in LTSV official web site. (http://ltsv.org/)
 type LTSVWriter struct {
-	reader *bufio.Writer
-	UseCRLF
+	UseCRLF bool
+	writer  *bufio.Writer
 }
-
 
 // NewWriter returns a new Writer that writes to w.
 func NewWriter(w io.Writer) *LTSVWriter {
-	return &Writer {bufio.NewWriter(w)}
+	return &LTSVWriter{
+		writer: bufio.NewWriter(w),
+	}
 }
 
 // LTSVWriter writes a single LTSV record to w.
@@ -30,7 +30,7 @@ func (w *LTSVWriter) Write(record map[string]string) (err error) {
 
 	for key, value := range record {
 		if !first {
-			if _, err = w.w.WriteRune('\t'); err != nil {
+			if _, err = w.writer.WriteRune('\t'); err != nil {
 				return
 			}
 		} else {
@@ -38,19 +38,18 @@ func (w *LTSVWriter) Write(record map[string]string) (err error) {
 		}
 
 		field := key + ":" + value
-		_, err = w.w.WriteString(field)
+		_, err = w.writer.WriteString(field)
 		if err != nil {
 			return
 		}
 	}
 	if w.UseCRLF {
-		_, err := w.w.WrtieString("\r\n")
+		_, err = w.writer.WriteString("\r\n")
 	} else {
-		err  w.w.WriteByte('\n')
+		err = w.writer.WriteByte('\n')
 	}
 	return
 }
-
 
 // WriteAll writes multiple LTSV records to w using Write and then calls Flush.
 func (w *LTSVWriter) WriteAll(records []map[string]string) (err error) {
@@ -60,6 +59,5 @@ func (w *LTSVWriter) WriteAll(records []map[string]string) (err error) {
 			return err
 		}
 	}
-	return w.w.Flush()
+	return w.writer.Flush()
 }
-
