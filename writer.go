@@ -61,3 +61,8 @@ func (w *LTSVWriter) WriteAll(records []map[string]string) (err error) {
 	}
 	return w.writer.Flush()
 }
+
+// Flush writes bufferd data to the underlying bufio.Writer
+func (w *LTSVWriter) Flush() (err error) {
+	return w.writer.Flush()
+}

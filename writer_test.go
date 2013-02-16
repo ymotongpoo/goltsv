@@ -54,7 +54,7 @@ func TestWrite(t *testing.T) {
 		f := NewWriter(b)
 		f.UseCRLF = tt.UseCRLF
 		err := f.Write(tt.Input)
-		err = f.writer.Flush()
+		err = f.Flush()
 		if err != nil {
 			t.Errorf("Unexpected error: %s\n", err)
 		}
@@ -90,5 +90,36 @@ func TestWriteAll(t *testing.T) {
 		if !reflect.DeepEqual(out, tt.Input) {
 			t.Errorf("#%d: out=%q want %q", n, b.String(), tt.Output)
 		}
+	}
+}
+
+func TestFlush(t *testing.T) {
+	b := &bytes.Buffer{}
+	f := NewWriter(b)
+	inputs := make([]map[string]string, 0)
+	for _, tt := range writeTests {
+		f.UseCRLF = tt.UseCRLF
+		err := f.Write(tt.Input)
+		if err != nil {
+			t.Errorf("Unexpected error: %s\n", err)
+		}
+		inputs = append(inputs, tt.Input)
+	}
+
+	err := f.Flush()
+	if err != nil {
+		t.Errorf("Unexpected error: %s\n", err)
+	}
+
+	// Note: In Go, map doesn't guarantee order of elements, so comparing
+	// original map and map generated from output string by LTSVReader.
+	r := NewReader(b)
+	out, err := r.ReadAll()
+	if err != nil {
+		t.Errorf("Unexpected error: %s\n", err)
+	}
+
+	if !reflect.DeepEqual(out, inputs) {
+		t.Errorf("out=%q want %q", b.String(), inputs)
 	}
 }
